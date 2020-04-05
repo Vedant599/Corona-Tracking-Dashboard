@@ -1,0 +1,45 @@
+{% extends "layout.html" %} {% block title %} Corona Tracker {% endblock title
+%} {% block body %}
+<!-- <h1>Shree Ganeshay Namah</h1> -->
+<div
+  class="jumbotron text-center"
+  style="margin-top: 20px; background-color: greenyellow;"
+>
+  <div class="container">
+    <h1>Corona virus 2019 India Statistics</h1>
+    <form class="form-inline" style="margin-left:35%; margin-top: 25px;">
+      <input
+        class="form-control mr-sm-2"
+        type="search"
+        placeholder="Search"
+        aria-label="Search"
+      />
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+  </div>
+</div>
+
+<table class="table table-striped">
+  <tr>
+    <th>State</th>
+    <th>Active Cases</th>
+    <th>Recovered</th>
+    <th>Death</th>
+  </tr>
+  {% for state_data in json_data %}
+
+  <tr>
+    <td>
+      <a href="/state/{{state_data.state}}">
+        {{state_data.state}}
+      </a>
+    </td>
+    <td>{{state_data.confirmed}}</td>
+    <td>{{state_data.recovered}}</td>
+    <td>{{state_data.deaths}}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock body %}

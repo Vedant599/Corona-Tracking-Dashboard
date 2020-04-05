@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+  Corona tracker
+{% endblock title %}
+
+{% block body %}
+<h1 style="margin-top: 30px; margin-bottom: 30px;">{{state}}</h1>
+  <table class="table table-striped">
+      <th>District</th>
+      <th>Confirmed Cases</th>
+      {% for state_data in json_data %}
+        {% if state_data.state == state %}
+          {% for district_data in state_data.districtData %}
+            <tr>
+                <td>
+                    {{district_data.district}}
+                </td>
+                <td>
+                    {{district_data.confirmed}}
+                </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+  </table>
+{% endblock body %}
