@@ -21,5 +21,9 @@ def state(state):
     main_api='https://api.covid19india.org/v2/state_district_wise.json'
     json_data=requests.get(main_api).json()
     return render_template('state.html',json_data=json_data,state=state)
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('map.html')
 if(__name__=='__main__'):
     app.run(debug=True)

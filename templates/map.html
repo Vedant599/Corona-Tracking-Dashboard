@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Corona Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+  <style>
+    #map {
+      width: 50vw;
+      height: 87vh;
+    }
+
+    #chart {
+      position: absolute;
+      right: 5px;
+      top: 5%;
+      margin-top: 30px;
+      display: flex;
+
+    }
+  </style>
+</head>
+
+<body>
+  {% include "./includes/_navbar.html" %}
+  <div id="map" style="margin:10px; display:flex;"></div>
+  <div id="chart" style="float: right; width: 45%; display:flex;">
+
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+</body>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js"></script>
+<script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+<script>
+  mapboxgl.accessToken =
+    "pk.eyJ1IjoidmVkYW50NTk5IiwiYSI6ImNrOGljMWpiYzAzc2kzbG9lOXVzejRvMXYifQ.V0d9YSLPRqYMHpn8olqKgw";
+  var map = new mapboxgl.Map({
+    container: "map",
+    style: "mapbox://styles/mapbox/dark-v10",
+
+    center: [78.9, 20.5],
+    zoom: 3.8,
+  });
+</script>
+
+<script>
+  function updateMap() {
+    fetch("http://127.0.0.1:5500/data.json")
+      .then(response => response.json())
+      .then(rsp => {
+        console.log(rsp.data.statewise)
+        rsp.data.statewise.forEach(element => {
+
+          rsp.data.stlonglat.forEach(ele => {
+            if (ele.state == element.state) {
+              latitude = ele.lat
+              longitude = ele.lon
+            }
+          })
+          cases = element.confirmed
+          if (cases > 500) {
+            color = "rgb(255,0,0)"
+          }
+          else if (cases > 450) {
+            color = "rgb(230,0,0)"
+          }
+          else if (cases > 400) {
+            color = "rgb(200,0,0)"
+          }
+          else if (cases > 300) {
+            color = "rgb(175,0,0)"
+          }
+          else if (cases > 250) {
+            color = "rgb(150,0,0)"
+          }
+          else if (cases > 200) {
+            color = "rgb(100,0,0)"
+          }
+          else if (cases > 150) {
+            color = "rgb(100,0,0)"
+          }
+          else {
+            color = "rgb(75,0,0)"
+          }
+          new mapboxgl.Marker({
+            draggable: false,
+            color: color
+          })
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        });
+      })
+  }
+  updateMap();
+</script>
+
+<script src="{{ url_for('static', filename="js/plotly.min.js")}}"></script>
+<script>
+  function updateChart() {
+    var layout = {
+      showlegend: true,
+      title: 'Title of the Graph',
+      xaxis: {
+        title: 'x-axis title'
+      },
+      yaxis: {
+        title: 'y-axis title'
+      }
+    };
+    fetch("https://api.covid19india.org/data.json")
+      .then(response => response.json())
+      .then(rsp => {
+        var trace1={
+          y: [rsp.cases_time_series[0].totalconfirmed],
+          type: 'line'
+        }
+        var data=[trace1]
+        var layout = {
+  title: {
+    text:'Increase of Corona virus with time in India',
+    font: {
+      family: 'Courier New, monospace',
+      size: 20
+    },
+    xref: 'paper',
+    x: 0.05,
+  },
+  xaxis: {
+    title: {
+      text: 'Time wrt january',
+      font: {
+        family: 'Courier New, monospace',
+        size: 16,
+        color: '#7f7f7f'
+      }
+    },
+  },
+  yaxis: {
+    title: {
+      text: 'Cases Confirmed',
+      font: {
+        family: 'Courier New, monospace',
+        size: 16,
+        color: '#7f7f7f'
+      }
+    }
+  }
+};
+
+Plotly.newPlot('chart', data, layout);
+        rsp.cases_time_series.forEach(element => {
+          Plotly.extendTraces('chart', { y: [[parseInt(element.totalconfirmed)]] }, [0])
+        });
+
+
+      })
+
+  }
+  updateChart();
+</script>
+
+</html>

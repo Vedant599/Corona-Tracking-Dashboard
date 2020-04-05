@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <div id="chart"></div>
+    </body>
+    <script src=../../plotly.min.js></script>
+    <script>
+      function updateChart()
+  {
+      fetch("https://api.covid19india.org/data.json")
+      .then(response => response.json())
+      .then(rsp =>{
+          Plotly.plot('chart',[{ 
+              y:[rsp.cases_time_series[0].totalconfirmed],
+              type:'line'
+              }]); 
+          rsp.cases_time_series.forEach(element => {
+             Plotly.extendTraces('chart',{y:[[parseInt(element.totalconfirmed)]]},[0])
+          });
+          
+          
+      })
+    
+  }
+  updateChart();
+    </script>
+</html>
