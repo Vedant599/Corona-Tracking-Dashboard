@@ -60,50 +60,54 @@
 
 <script>
   function updateMap() {
-    fetch("http://127.0.0.1:5500/data.json")
+    fetch("/static/data.json")
       .then(response => response.json())
-      .then(rsp => {
-        console.log(rsp.data.statewise)
-        rsp.data.statewise.forEach(element => {
+      .then(rsp1 => {
+        fetch("https://api.rootnet.in/covid19-in/unofficial/covid19india.org/statewise")
+          .then(response1 => response1.json())
+          .then(rsp => {
+            console.log(rsp1.data.statewise);
+            rsp.data.statewise.forEach(element => {
 
-          rsp.data.stlonglat.forEach(ele => {
-            if (ele.state == element.state) {
-              latitude = ele.lat
-              longitude = ele.lon
-            }
-          })
-          cases = element.confirmed
-          if (cases > 500) {
-            color = "rgb(255,0,0)"
-          }
-          else if (cases > 450) {
-            color = "rgb(230,0,0)"
-          }
-          else if (cases > 400) {
-            color = "rgb(200,0,0)"
-          }
-          else if (cases > 300) {
-            color = "rgb(175,0,0)"
-          }
-          else if (cases > 250) {
-            color = "rgb(150,0,0)"
-          }
-          else if (cases > 200) {
-            color = "rgb(100,0,0)"
-          }
-          else if (cases > 150) {
-            color = "rgb(100,0,0)"
-          }
-          else {
-            color = "rgb(75,0,0)"
-          }
-          new mapboxgl.Marker({
-            draggable: false,
-            color: color
-          })
-            .setLngLat([longitude, latitude])
-            .addTo(map);
-        });
+              rsp1.data.stlonglat.forEach(ele => {
+                if (ele.state == element.state) {
+                  latitude = ele.lat
+                  longitude = ele.lon
+                }
+              })
+              cases = element.confirmed
+              if (cases > 500) {
+                color = "rgb(255,0,0)"
+              }
+              else if (cases > 450) {
+                color = "rgb(230,0,0)"
+              }
+              else if (cases > 400) {
+                color = "rgb(200,0,0)"
+              }
+              else if (cases > 300) {
+                color = "rgb(175,0,0)"
+              }
+              else if (cases > 250) {
+                color = "rgb(150,0,0)"
+              }
+              else if (cases > 200) {
+                color = "rgb(100,0,0)"
+              }
+              else if (cases > 150) {
+                color = "rgb(100,0,0)"
+              }
+              else {
+                color = "rgb(75,0,0)"
+              }
+              new mapboxgl.Marker({
+                draggable: false,
+                color: color
+              })
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+            });
+          });
       })
   }
   updateMap();
@@ -125,44 +129,44 @@
     fetch("https://api.covid19india.org/data.json")
       .then(response => response.json())
       .then(rsp => {
-        var trace1={
+        var trace1 = {
           y: [rsp.cases_time_series[0].totalconfirmed],
           type: 'line'
         }
-        var data=[trace1]
+        var data = [trace1]
         var layout = {
-  title: {
-    text:'Increase of Corona virus with time in India',
-    font: {
-      family: 'Courier New, monospace',
-      size: 20
-    },
-    xref: 'paper',
-    x: 0.05,
-  },
-  xaxis: {
-    title: {
-      text: 'Time wrt january',
-      font: {
-        family: 'Courier New, monospace',
-        size: 16,
-        color: '#7f7f7f'
-      }
-    },
-  },
-  yaxis: {
-    title: {
-      text: 'Cases Confirmed',
-      font: {
-        family: 'Courier New, monospace',
-        size: 16,
-        color: '#7f7f7f'
-      }
-    }
-  }
-};
+          title: {
+            text: 'Increase of Corona virus with time in India',
+            font: {
+              family: 'Courier New, monospace',
+              size: 20
+            },
+            xref: 'paper',
+            x: 0.05,
+          },
+          xaxis: {
+            title: {
+              text: 'Time wrt january',
+              font: {
+                family: 'Courier New, monospace',
+                size: 16,
+                color: '#7f7f7f'
+              }
+            },
+          },
+          yaxis: {
+            title: {
+              text: 'Cases Confirmed',
+              font: {
+                family: 'Courier New, monospace',
+                size: 16,
+                color: '#7f7f7f'
+              }
+            }
+          }
+        };
 
-Plotly.newPlot('chart', data, layout);
+        Plotly.newPlot('chart', data, layout);
         rsp.cases_time_series.forEach(element => {
           Plotly.extendTraces('chart', { y: [[parseInt(element.totalconfirmed)]] }, [0])
         });
